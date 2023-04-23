@@ -1,0 +1,69 @@
+diff --git a/build_defs.bzl b/build_defs.bzl
+index cde1e93..e8dba55 100644
+--- a/build_defs.bzl
++++ b/build_defs.bzl
+@@ -35,6 +35,7 @@ def pybind_extension
+         linkopts = [],
+         tags = [],
+         deps = [],
++        visibility = None,
+         **kwargs):
+     # Mark common dependencies as required for build_cleaner.
+     tags = tags + ["req_dep=%s" % dep for dep in PYBIND_DEPS]
+@@ -41,6 +42,11 @@ def pybind_extension(
+ 
+     native.cc_binary(
+         name = name + ".so",
++        target_compatible_with = select({
++          "@platforms//os:windows": ["@platforms//:incompatible"],
++          "//conditions:default": [],
++        }),
++        visibility = visibility,
+         copts = copts + PYBIND_COPTS + select({
+             "@pybind11//:msvc_compiler": [],
+             "//conditions:default": [
+@@ -59,6 +65,44 @@ def pybind_extension(
+         **kwargs
+     )
+ 
++    native.cc_binary(
++        name = name + ".dll",
++        target_compatible_with = select({
++          "@platforms//os:windows": [],
++          "//conditions:default": ["@platforms//:incompatible"],
++        }),
++        copts = copts + PYBIND_COPTS,
++        features = features + PYBIND_FEATURES,
++        linkopts = linkopts,
++        linkshared = 1,
++        tags = tags,
++        deps = deps + PYBIND_DEPS,
++        visibility = visibility,
++        **kwargs
++    )
++
++    native.genrule(
++        name = name + "_pyd",
++        target_compatible_with = select({
++          "@platforms//os:windows": [],
++          "//conditions:default": ["@platforms//:incompatible"],
++        }),
++        srcs = [name + ".dll"],
++        outs = [name + ".pyd"],
++        cmd = "cp $< $@",
++        visibility = visibility,
++    )
++
++    native.py_library(
++        name = name,
++        data = select({
++            "@platforms//os:windows": [":" + name + ".pyd"],
++            "//conditions:default": [":" + name + ".so"],
++        }),
++        visibility = visibility,
++    )
++
++
+ # Builds a pybind11 compatible library. This can be linked to a pybind_extension.
+ def pybind_library(
+         name,

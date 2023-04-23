@@ -1,82 +1,53 @@
+"""Base Wordle definitions."""
+
 #! /usr/bin/env python3
 
 import abc
 import argparse
-import collections
-import enum
-import functools
 import string
-import random
 
 
-class Match(enum.Enum):
-    NOT_PRESENT = 0
-    EXACT_PLACE = 1
-    NOT_HERE = 2
+from wordle.pywordle import Match, get_matches, parse_matches, repr_matches
 
 
 TMatches = tuple[Match]
 
 
+class UnknownWordException(Exception):
+    """Unknown word exception"""
+
+    def __init__(self, word: str) -> None:
+        self.word = word
+
+
+class Wordle(abc.ABC):
+    """Base class for wordle based game"""
+
+    @abc.abstractmethod
+    def test(self, attempt: str) -> TMatches:
+        """Tests attept for matches"""
+
+
+__all__ = [
+    'Match',
+    'TMatches',
+    'Wordle',
+    'UnknownWordException',
+    'get_matches',
+    'parse_matches',
+    'repr_matches',
+    'load_dictionary',
+]
+
+
 PROMPT = "Type your word: "
-DEFAULT_DATABASE = "nytimes-words.txt"
+DEFAULT_DATABASE = "data/nytimes-words.txt"
 MATCH_TO_SYMBOL = {
     Match.NOT_PRESENT: ' ',
     Match.EXACT_PLACE: '^',
     Match.NOT_HERE: '.',
 }
 SYMBOL_TO_MATCH = {s: m for m, s in MATCH_TO_SYMBOL.items()}
-
-
-def parse_matches(response: str) -> TMatches:
-    return tuple((
-        SYMBOL_TO_MATCH[c] for c in response
-    ))
-
-
-@functools.lru_cache
-def get_matches(attempt: str, word: str) -> TMatches:
-    cnts = collections.defaultdict(int)
-    for c in word:
-        cnts[c] += 1
-
-    matches = [Match.NOT_PRESENT for _ in word]
-    for i, (a, w) in enumerate(zip(attempt, word)):
-        if a == w:
-            matches[i] = Match.EXACT_PLACE
-            cnts[a] -= 1
-
-    for i, a in enumerate(attempt):
-        if cnts[a] > 0:
-            cnts[a] -= 1
-            matches[i] = Match.NOT_HERE
-
-    return tuple(matches)
-
-
-class UnknownWordException(Exception):
-    def __init__(self, word: str) -> None:
-        self.word = word
-
-
-class Wordle:
-    @abc.abstractmethod
-    def test(self, attemt: str) -> TMatches:
-        pass
-
-
-class LocalWordle(Wordle):
-    def __init__(self, path_to_dict: str, seed: int) -> None:
-        self.words = load_dictionary(path_to_dict)
-        if 0 <= seed < len(self.words):
-            self.word = self.words[seed]
-        else:
-            self.word = random.choice(self.words)
-
-    def test(self, attempt: str) -> TMatches:
-        if attempt not in self.words:
-            raise UnknownWordException(attempt)
-        return get_matches(attempt, self.word)
 
 
 class IOWorlde(Wordle):
@@ -105,7 +76,7 @@ class Guesser:
         print(''.join(MATCH_TO_SYMBOL[c] for c in matches), sep='')
 
         for c, m in zip(attempt, matches):
-            if m is Match.NOT_PRESENT:
+            if m == Match.NOT_PRESENT:
                 self.not_used.add(c)
             else:
                 self.used.add(c)
@@ -130,7 +101,12 @@ def main() -> None:
     parser.add_argument('--dict_path', default=DEFAULT_DATABASE)
 
     args = parser.parse_args()
-    wordle = LocalWordle(args.dict_path, args.seed)
+
+    word = None
+    if args.seed != -1:
+        word = load_dictionary(DEFAULT_DATABASE)[args.seed]
+
+    wordle = LocalWordle(args.dict_path, word)
 
     alphabet = string.ascii_lowercase
     used, not_used = set(), set()
@@ -146,7 +122,7 @@ def main() -> None:
             continue
 
         for c, m in zip(attempt, matches):
-            if m is Match.NOT_PRESENT:
+            if m == Match.NOT_PRESENT:
                 not_used.add(c)
             else:
                 used.add(c)
