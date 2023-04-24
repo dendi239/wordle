@@ -12,7 +12,7 @@ py_library(
 py_library(
     name = "io_strategy",
     srcs = ["io_strategy.py"],
-    visibility = ["//:__pkg__"],
+    visibility = ["//visibility:public"],
     deps = [
         "//strategy",
         "//wordle",

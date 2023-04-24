@@ -14,13 +14,17 @@ pybind_extension(
     deps = [":libwordle"],
 )
 
-py_binary(
+py_library(
     name = "wordle",
     srcs = ["wordle.py"],
-    data = ["//data:nytimes-words.txt"],
-    main = "wordle.py",
     visibility = ["//visibility:public"],
     deps = [":pywordle"],
+)
+
+py_library(
+    name = "io_wordle",
+    srcs = ["io_wordle.py"],
+    deps = [":wordle"],
 )
 
 py_library(
