@@ -20,11 +20,14 @@ class Strategy(abc.ABC):
 
 class Scorer:
     """Scores particular *Strategy* on different words.
-    
+
     Takes dictionary to work with and factory so each state is different.
     Stores all the stats in self.stats
     """
-    def __init__(self, dictionary: tuple[str], strategy_factory: tp.Mapping[None, Strategy]):
+
+    def __init__(
+        self, dictionary: tuple[str], strategy_factory: tp.Mapping[None, Strategy]
+    ):
         self.dictionary = dictionary
         self.factory = strategy_factory
         self.stats = [0] * 7

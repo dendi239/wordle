@@ -13,9 +13,11 @@ class EliminateMostWordsStrategy(strategy.Strategy):
     """Strategy that eliminates most words in the worst case."""
 
     def __init__(self, dict_path: str) -> None:
-        self.strategy = simplify_words_count \
-            .py_simplify_words_count \
-            .EliminateMostWordsStrategy(dict_path)
+        self.strategy = (
+            simplify_words_count.py_simplify_words_count.EliminateMostWordsStrategy(
+                dict_path
+            )
+        )
 
     def new_word(self) -> str:
         return self.strategy.new_word()
@@ -24,6 +26,6 @@ class EliminateMostWordsStrategy(strategy.Strategy):
         self.strategy.record(word, matches)
 
     @classmethod
-    def default(cls) -> 'EliminateMostWordsStrategy':
+    def default(cls) -> "EliminateMostWordsStrategy":
         """Default implementation that using nytimes words list."""
-        return EliminateMostWordsStrategy('data/nytimes-words.txt')
+        return EliminateMostWordsStrategy("data/nytimes-words.txt")
