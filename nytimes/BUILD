@@ -10,6 +10,7 @@ py_binary(
     visibility = ["//:__pkg__"],
     deps = [
         ":nytimes",
+        "//data:database",
         "//strategy:io_strategy",
         "//wordle",
         "//wordle:local_wordle",

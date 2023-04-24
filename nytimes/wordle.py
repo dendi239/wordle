@@ -3,35 +3,36 @@
 import asyncio
 import argparse
 import datetime
-import string
 
+import data.database as data
 import nytimes.nytimes as nytimes
 import strategy.io_strategy as io_strategy
 import wordle.wordle as wordle
 import wordle.local_wordle as local_wordle
 
 
-DEFAULT_DATABASE = "data/nytimes-words.txt"
 PROMPT = "Type your word: "
 
 
 async def get_wordle(
-        date: datetime.date = datetime.date.today(),
-        dict_path: str = DEFAULT_DATABASE,
+    date: datetime.date = datetime.date.today(),
+    dict_path: str = data.DEFAULT_DATABASE,
 ) -> wordle.Wordle:
     """Gets NYTimes wordle for specified date."""
     async with nytimes.NYSession() as session:
-        return local_wordle.LocalWordle(dict_path, (await session.get_stats(date))['solution'])
+        return local_wordle.LocalWordle(
+            dict_path, (await session.get_stats(date))["solution"]
+        )
 
 
 def main() -> None:
     """Main function."""
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--dict_path', default=DEFAULT_DATABASE)
+    parser.add_argument("--dict_path", default=data.DEFAULT_DATABASE)
     parser.add_argument(
-        '--date',
-        type=lambda s: datetime.datetime.strptime(s, '%Y-%m-%d'),
+        "--date",
+        type=lambda s: datetime.datetime.strptime(s, "%Y-%m-%d"),
         default=datetime.datetime.today(),
     )
 
@@ -54,5 +55,5 @@ def main() -> None:
             break
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
