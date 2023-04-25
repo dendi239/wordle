@@ -3,9 +3,6 @@ load("@rules_python//python:defs.bzl", "py_binary")
 py_binary(
     name = "wordle",
     srcs = ["wordle.py"],
-    data = [
-        "//data:nytimes-words.txt",
-    ],
     main = "wordle.py",
     visibility = ["//:__pkg__"],
     deps = [

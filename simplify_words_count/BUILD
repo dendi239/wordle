@@ -17,10 +17,10 @@ pybind_extension(
 py_library(
     name = "simplify_words_count",
     srcs = ["simplify_words_count.py"],
-    data = ["//data:nytimes-words.txt"],
     visibility = ["//:__pkg__"],
     deps = [
         ":py_simplify_words_count",
+        "//data:database",
         "//strategy",
     ],
 )

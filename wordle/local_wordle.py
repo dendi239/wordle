@@ -3,6 +3,7 @@
 import random
 import typing as tp
 
+import data.database as data
 import wordle.wordle as wordle
 
 
@@ -10,7 +11,7 @@ class LocalWordle(wordle.Wordle):
     """Local wordle represents wordle holding hidden word."""
 
     def __init__(self, path_to_dict: str, word: tp.Optional[str] = None) -> None:
-        self.words = wordle.load_dictionary(path_to_dict)
+        self.words = data.load_dictionary(path_to_dict)
 
         if word is not None:
             self.word = word

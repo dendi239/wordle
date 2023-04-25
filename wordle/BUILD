@@ -29,7 +29,12 @@ py_library(
 
 py_library(
     name = "local_wordle",
-    srcs = ["local_wordle.py"],
-    visibility = ["//visibility:public"],
+    srcs = [
+        "local_wordle.py",
+        "//data:database",
+    ],
+    visibility = [
+        "//visibility:public",
+    ],
     deps = [":wordle"],
 )
