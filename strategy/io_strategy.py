@@ -11,6 +11,7 @@ class IOStrategy(strategy.Strategy):
     """Strategy that asks user to make each guess"""
 
     def __init__(self) -> None:
+        super().__init__()
         self.alphabet = string.ascii_lowercase
         self.used, self.not_used = set(), set()
 
