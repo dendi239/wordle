@@ -4,7 +4,7 @@
 
 import abc
 
-from wordle.pywordle import Match, get_matches, parse_matches, repr_matches
+from wordle.py_wordle import Match, get_matches, parse_matches, repr_matches
 
 
 TMatches = tuple[Match]

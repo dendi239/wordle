@@ -1,16 +1,17 @@
 load("@pybind11_bazel//:build_defs.bzl", "pybind_extension")
-load("@rules_python//python:defs.bzl", "py_binary")
+load("@rules_python//python:defs.bzl", "py_library")
 
 cc_library(
     name = "libwordle",
     srcs = ["wordle.cpp"],
     hdrs = ["wordle.hpp"],
     visibility = ["//visibility:public"],
+    deps = ["//utility"],
 )
 
 pybind_extension(
-    name = "pywordle",
-    srcs = ["pywordle.cpp"],
+    name = "py_wordle",
+    srcs = ["py_wordle.cpp"],
     deps = [":libwordle"],
 )
 
@@ -18,7 +19,7 @@ py_library(
     name = "wordle",
     srcs = ["wordle.py"],
     visibility = ["//visibility:public"],
-    deps = [":pywordle"],
+    deps = [":py_wordle"],
 )
 
 py_library(

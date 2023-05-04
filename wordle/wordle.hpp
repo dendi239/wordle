@@ -19,11 +19,12 @@ Matches GetMatchesStr(::std::string guess, ::std::string word);
 ::std::string ReprMatches(const Matches &matches);
 Matches ParseMatches(const ::std::string &matches_str);
 
-} // namespace wordle
+}  // namespace wordle
 
 namespace std {
 
-template <> struct hash<::wordle::Matches> {
+template <>
+struct hash<::wordle::Matches> {
   int operator()(const ::wordle::Matches &matches) const noexcept {
     int result = 0;
     for (auto m : matches) {
@@ -33,4 +34,4 @@ template <> struct hash<::wordle::Matches> {
   }
 };
 
-} // namespace std
+}  // namespace std
