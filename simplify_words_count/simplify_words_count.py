@@ -10,21 +10,8 @@ import wordle.wordle as wordle
 import simplify_words_count.py_simplify_words_count
 
 
-class EliminateMostWordsStrategy(strategy.Strategy):
+class EliminateMostWordsStrategy(simplify_words_count.py_simplify_words_count.EliminateMostWordsStrategy):
     """Strategy that eliminates most words in the worst case."""
-
-    def __init__(self, dict_path: str) -> None:
-        self.strategy = (
-            simplify_words_count.py_simplify_words_count.EliminateMostWordsStrategy(
-                dict_path
-            )
-        )
-
-    def new_word(self) -> str:
-        return self.strategy.new_word()
-
-    def record(self, word: str, matches: wordle.TMatches) -> None:
-        self.strategy.record(word, matches)
 
     @classmethod
     def default(cls) -> "EliminateMostWordsStrategy":

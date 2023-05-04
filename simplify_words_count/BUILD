@@ -5,7 +5,11 @@ cc_library(
     name = "lib_simplify_words_count",
     srcs = ["simplify_words_count.cpp"],
     hdrs = ["simplify_words_count.hpp"],
-    deps = ["//wordle:libwordle"],
+    deps = [
+        "//strategy:libstrategy",
+        "//utility",
+        "//wordle:libwordle",
+    ],
 )
 
 pybind_extension(
