@@ -3,6 +3,7 @@
 import asyncio
 import argparse
 import datetime
+import typing as tp
 
 import data.database as data
 import nytimes.nytimes as nytimes
@@ -15,10 +16,18 @@ PROMPT = "Type your word: "
 
 
 async def get_wordle(
-    date: datetime.date = datetime.date.today(),
+    date: tp.Optional[datetime.date] = None,
     dict_path: str = data.DEFAULT_DATABASE,
 ) -> wordle.Wordle:
     """Gets NYTimes wordle for specified date."""
+    if date is None:
+        date = datetime.date.today()
+
+    await nytimes.amend_csv_to(date)
+    for row in nytimes.read_current_csv(nytimes.DEFAULT_CSV_LOCATION).rows:
+        if row["print_date"] == date.strftime("%Y-%m-%d"):
+            return local_wordle.LocalWordle(dict_path, row["solution"])
+
     async with nytimes.NYSession() as session:
         return local_wordle.LocalWordle(
             dict_path, (await session.get_stats(date))["solution"]

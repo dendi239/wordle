@@ -13,6 +13,8 @@ import aiohttp
 
 TStats = dict[str, tp.Any]
 
+DEFAULT_CSV_LOCATION = "nytimes/nytimes.csv"
+
 
 class NYSession:
     """Aiohttp based class for handling session of connection to nytimes.com"""
@@ -78,22 +80,16 @@ def sort_csv_data(csv_location: str) -> None:
         writer.writerows(rows)
 
 
-async def main() -> None:
-    """Main function"""
-    fieldnames = ["id", "solution", "print_date", "days_since_launch", "editor"]
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--csv", help="path to csv", default="nytimes/nytimes.csv")
-    parser.add_argument(
-        "--shuffle",
-        action="store_true",
-        help="removes duplicates from list and sorts by the date",
-    )
-    args = parser.parse_args()
-
-    csv_location = args.csv
-
+async def amend_csv_to(date: datetime.date, csv_location=DEFAULT_CSV_LOCATION) -> None:
+    """Appends data for all days not present in csv up to given date."""
     csv_data = read_current_csv(csv_location)
+    csv_data.fieldnames = csv_data.fieldnames or [
+        "id",
+        "solution",
+        "print_date",
+        "days_since_launch",
+        "editor",
+    ]
     known = {int(row["days_since_launch"]) for row in csv_data.rows}
 
     async with NYSession() as session:
@@ -102,11 +98,24 @@ async def main() -> None:
                 if i not in known:
                     date = csv_data.launch_date + datetime.timedelta(days=i)
                     row = await session.get_stats(date)
-                    writer = csv.DictWriter(nytimescsv, fieldnames)
+                    writer = csv.DictWriter(nytimescsv, csv_data.fieldnames)
                     writer.writerow(row)
 
+
+async def main() -> None:
+    """Main function"""
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--csv", help="path to csv", default=DEFAULT_CSV_LOCATION)
+    parser.add_argument(
+        "--shuffle",
+        action="store_true",
+        help="removes duplicates from list and sorts by the date",
+    )
+    args = parser.parse_args()
+
+    await amend_csv_to(datetime.date.today(), args.csv)
     if args.shuffle:
-        sort_csv_data(csv_location)
+        sort_csv_data(args.csv)
 
 
 if __name__ == "__main__":
