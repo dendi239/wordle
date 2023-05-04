@@ -4,7 +4,7 @@ import argparse
 
 from data.database import DEFAULT_DATABASE, load_dictionary
 from strategy.io_strategy import IOStrategy
-from wordle.wordle import Match, load_dictionary
+from wordle.wordle import Match
 from wordle.local_wordle import LocalWordle
 
 
